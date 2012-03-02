@@ -1,0 +1,25 @@
+I want to develop a gem to manipulate text columns in a model.
+
+Idea:
+  If a model has one or several text type columns, it will slow down to query all records.
+This gem is intended to move the text columns to a seperate table, called texts. The table 
+texts may contains columns id, target_model_id, target_model, target_column, content and others created_at, updated_at.
+
+for example, 
+model: fund - id, name, fund_symbol, risk_desc (text), production_desc (text)
+                      1, 'ABC', '100020' , 'low risk, blabla...', 'This fund is very attractive, blabla'
+then
+table: texts
+ id 	target_model_id, target_model, target_column, content
+ 1	1		Fund	risk_desc	        'low risk, blabla....'
+2	2		Fund	production_desc 'This fund is very attractive, blabla'
+
+The model becomes id, name, fund_symbol, risk_desc, production_desc
+		1, 'ABC', '100020', 	     1,	     2
+
+let's say we have a variable f=Fund.find(1); then we can access to its text content, like this, f.risk_desc_text or f.production_desc_text
+
+though, it becomes fast using Fund.all, as there is no text column listed.
+
+But as a drawback, you can access its texts columns in a list, like Fund.all.text_includes(:risk_desc, :production_desc).
+
